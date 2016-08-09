@@ -56,7 +56,7 @@ fetchDetailedJob :: String -> QueryParameters -> AppUrl -> IO (Either String (Ma
 fetchDetailedJob jobId' params url = do
     let (AppUrl rawUrl) = url
     let finalUrl = rawUrl ++ "/proxy/" ++ (Utils.toApplicationId jobId') ++ "/ws/v1/mapreduce/jobs/" ++ (Utils.toJobId jobId')
-    Net.fetchJsonUrl params finalUrl job
+    ((job <$>) <$>) <$> Net.fetchJsonUrl params finalUrl
 
 jobInfoToJob :: String -> Maybe JobInfo -> Maybe DetailedJob.DetailedJob
 jobInfoToJob _ Nothing = Nothing

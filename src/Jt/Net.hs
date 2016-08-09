@@ -40,11 +40,11 @@ redirectToNothing (Left "TooManyRedirects") = Right Nothing
 redirectToNothing (Right a) = Right (Just a)
 redirectToNothing (Left a) = Left a
 
-fetchJsonUrl :: (FromJSON a, Show a) => QP.QueryParameters -> String -> (a -> b) -> IO (Either String (Maybe b))
-fetchJsonUrl params' finalUrl transformer = do
+fetchJsonUrl :: FromJSON a => QP.QueryParameters -> String -> IO (Either String (Maybe a))
+fetchJsonUrl params' finalUrl = do
   jInfoEither <- (>>= eitherDecodePretty) <$> queryUrlWith params' finalUrl
   let
-    resApps = fmap transformer jInfoEither
+    resApps = jInfoEither
     withNoJob = redirectToNothing resApps
     resApps' = Utils.addInfo ("Url Queried: " ++ finalUrl ++ "\n") $ withNoJob
   return resApps'

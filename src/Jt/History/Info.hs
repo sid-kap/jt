@@ -70,7 +70,7 @@ fetchDetailedJob :: String -> QueryParameters -> HistoryUrl -> IO (Either String
 fetchDetailedJob jobId' queryParameters url = do
     let (HistoryUrl rawUrl) = url
     let finalUrl = rawUrl ++ "/ws/v1/history/mapreduce/jobs/" ++ (Utils.toJobId jobId')
-    Net.fetchJsonUrl queryParameters finalUrl job
+    ((job <$>) <$>) <$> Net.fetchJsonUrl queryParameters finalUrl
 
 fetchJob :: String -> QueryParameters -> HistoryUrl -> IO (Either String (Maybe DetailedJob.DetailedJob))
 fetchJob jobId' queryParameters url = do
@@ -78,7 +78,3 @@ fetchJob jobId' queryParameters url = do
   return $ convertL e
   where
     convertL lst = fmap (jobInfoToJob jobId') lst
-
-
-
-
