@@ -30,15 +30,10 @@ queryUrlWith params' url = do
 queryUrl :: String -> IO(Either String BL.ByteString)
 queryUrl = queryUrlWith QP.defaultsQP
 
-extractFromJson :: (FromJSON a, Show a) => IO (Either String BL.ByteString) -> IO (Either String a)
-extractFromJson ioData = do
-  e <- ioData
-  return $ do
-    bs <- e
-    eitherToError bs $ eitherDecode bs
-  where
-    eitherToError _ (Right a) = Right a
-    eitherToError input (Left l) = Left ("Unable to decode response:\n" ++ (BL.unpack input) ++ "\n\nError: " ++ l)
+eitherDecodePretty :: FromJSON a => BL.ByteString -> Either String a
+eitherDecodePretty bs = case eitherDecode bs of
+  Right a -> Right a
+  Left l  -> Left ("Unable to decode response:\n" ++ BL.unpack bs ++ "\n\nError: " ++ l)
 
 redirectToNothing :: Either String a -> Either String (Maybe a)
 redirectToNothing (Left "TooManyRedirects") = Right Nothing
@@ -47,7 +42,7 @@ redirectToNothing (Left a) = Left a
 
 fetchJsonUrl :: (FromJSON a, Show a) => QP.QueryParameters -> String -> (a -> b) -> IO (Either String (Maybe b))
 fetchJsonUrl params' finalUrl transformer = do
-  jInfoEither <- extractFromJson $ queryUrlWith params' finalUrl
+  jInfoEither <- (>>= eitherDecodePretty) <$> queryUrlWith params' finalUrl
   let
     resApps = fmap transformer jInfoEither
     withNoJob = redirectToNothing resApps
