@@ -115,11 +115,11 @@ printResults conf sargs = do
     historyQueryParameters = catMaybes [userOption, limitOption, historyStateOption]
 
   historyJobs <- if historyInclude
-                   then Job.jobsWithOpts historyQueryParameters (historyUrl server)
+                   then historyJobsWithOpts historyQueryParameters (historyUrl server)
                    else return $ Right []
 
   rmJobs <- if rmInclude
-              then Job.jobsWithOpts appQueryParameters (appUrl server)
+              then appJobsWithOpts appQueryParameters (appUrl server)
               else return $ Right []
 
   let

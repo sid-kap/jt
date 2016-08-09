@@ -1,6 +1,5 @@
 module Jt.Job (
     Job(..),
-    JobProvider(..),
     parseName,
     JobNameElements(..),
     ) where
@@ -46,8 +45,3 @@ data Job = Job {
   applicationId :: String,
   jobUrl :: String
 } deriving (Show, Eq)
-
-
-class JobProvider a where
-  jobs :: a -> IO (Either String [Job])
-  jobsWithOpts :: QP.QueryParameters -> a -> IO (Either String [Job])

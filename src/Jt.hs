@@ -4,8 +4,6 @@
 module Jt (
     -- * Modules
     readConfig,
-    jobs,
-    jobsWithOpts,
     Command(..),
     toAction,
     failOnNothing,

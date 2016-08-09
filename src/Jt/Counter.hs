@@ -59,4 +59,3 @@ grps2Cntrs x = collapse' x []
 rawFetchCounters :: QueryParameters -> String -> IO (Either String (Maybe [Counter]))
 rawFetchCounters queryParameters finalUrl = do
     Net.fetchJsonUrl queryParameters finalUrl (grps2Cntrs._raw_hadoop_field_counterGroup._raw_hadoop_field_jobCounters)
-

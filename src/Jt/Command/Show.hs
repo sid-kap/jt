@@ -28,18 +28,17 @@ showParser =
 
 printServer :: Server -> Bool -> Bool -> IO ()
 printServer server historyInclude rmInclude = do
-    printf "\t%s\t" (serverName server)
-    when historyInclude $ printf "%s\t" (historyUrlStr server)
-    when rmInclude      $ printf "%s\t" (rmUrlStr server)
+  printf "\t%s\t" (serverName server)
+  when historyInclude $ printf "%s\t" (historyUrlStr server)
+  when rmInclude      $ printf "%s\t" (rmUrlStr server)
   where
     historyUrlStr (Server _ _ (HistoryUrl url)) = url
     rmUrlStr      (Server _ (AppUrl url) _) = url
 
-
 printServerLn :: Bool -> Bool -> Server -> IO ()
 printServerLn historyInclude rmInclude server = do
-    printServer server historyInclude rmInclude
-    printf "\n"
+  printServer server historyInclude rmInclude
+  printf "\n"
 
 showAction :: Config -> ShowArgs -> IO ()
 showAction cfg sargs = do
