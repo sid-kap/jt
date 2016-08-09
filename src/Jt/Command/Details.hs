@@ -61,7 +61,7 @@ printResults :: Config -> JobArgs -> IO ()
 printResults conf sargs = do
     let jobId' = jobJobId sargs
     let server = extractServer conf (jobCluster sargs)
-    let queryParameters = QP.QueryParameters []
+    let queryParameters = []
     let fetchFromApp = AppInfo.fetchJob jobId' queryParameters $ appUrl server
     let fetchFromHistory = HistoryInfo.fetchJob jobId' queryParameters $ historyUrl server
     let historyQueryWithError = fmap failOnLeft fetchFromHistory :: IO (Maybe DetailedJob.DetailedJob)

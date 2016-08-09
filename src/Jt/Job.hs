@@ -5,7 +5,6 @@ module Jt.Job (
     JobNameElements(..),
     ) where
 
-import Jt.Utils (failOnLeft')
 import qualified Data.Int as Ints
 import qualified Jt.QueryParameters as QP
 import Data.Attoparsec.ByteString.Char8
@@ -50,7 +49,5 @@ data Job = Job {
 
 
 class JobProvider a where
-    jobs :: a -> IO (Either String [Job])
-    jobsWithOpts :: QP.QueryParameters -> a -> IO (Either String [Job])
-    jobsE :: a -> IO [Job]
-    jobsE j = jobs j >>= failOnLeft'
+  jobs :: a -> IO (Either String [Job])
+  jobsWithOpts :: QP.QueryParameters -> a -> IO (Either String [Job])

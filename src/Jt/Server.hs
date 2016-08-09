@@ -9,13 +9,17 @@ import qualified Jt.Job as Job
 import qualified Jt.History.Listing as History
 import qualified Jt.App.Listing as App
 import qualified Jt.QueryParameters as QP
-import Data.List(nub)
+import Data.List (nub)
 
-data HistoryUrl = HistoryUrl String deriving (Show, Eq, Ord)
+newtype HistoryUrl = HistoryUrl String deriving (Show, Eq, Ord)
 
-data AppUrl = AppUrl String deriving (Show, Eq, Ord)
+newtype AppUrl = AppUrl String deriving (Show, Eq, Ord)
 
-data Server = Server { serverName :: String, appUrl :: AppUrl, historyUrl :: HistoryUrl } deriving (Show, Eq, Ord)
+data Server = Server
+  { serverName :: String
+  , appUrl :: AppUrl
+  , historyUrl :: HistoryUrl
+  } deriving (Show, Eq, Ord)
 
 combineEither :: Either String [a] -> Either String [a] -> Either String [a]
 combineEither (Left e1) (Left e2) = Left $ e1 ++ "\n" ++ e2
@@ -30,7 +34,6 @@ instance Job.JobProvider AppUrl where
 instance Job.JobProvider HistoryUrl where
   jobs (HistoryUrl url) = History.fetchJobs QP.defaultsQP url
   jobsWithOpts opts (HistoryUrl url) = History.fetchJobs opts url
-
 
 instance Job.JobProvider Server where
   jobs s = do
