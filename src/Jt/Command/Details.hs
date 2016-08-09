@@ -4,6 +4,7 @@ module Jt.Command.Details (
 ) where
 
 import Jt
+import Jt.Utils (failOnLeft)
 import Jt.Command.Utils
 import Jt.Server
 import Options.Applicative
@@ -19,9 +20,9 @@ data JobArgs = JobArgs {  jobCluster :: Maybe String
 
 detailsCommand :: Command
 detailsCommand = Command { commandName = "details"
-                      , commandDesc = "details info on a job"
-                      , commandParser = jobParser
-                      , commandAction = detailsAction }
+                         , commandDesc = "details info on a job"
+                         , commandParser = jobParser
+                         , commandAction = detailsAction }
 
 jobParser :: Parser JobArgs
 jobParser = let

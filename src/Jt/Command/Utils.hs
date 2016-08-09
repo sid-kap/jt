@@ -44,3 +44,4 @@ toLocalTimeString timestamp64 = fmap printOut tzIO
 extractServer :: Config -> Maybe String -> Server
 extractServer cfg                 (Just q) = fromMaybe (err ("Unable to find cluster: " ++ q)) $ cfgLookup q cfg
 extractServer (Config _ defaultV) Nothing  = defaultV
+

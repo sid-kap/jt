@@ -8,7 +8,6 @@ module Jt (
     jobsWithOpts,
     Command(..),
     toAction,
-    failOnLeft,
     failOnNothing,
     cfgLookup,
     err,
@@ -77,15 +76,6 @@ data Config = Config {
 
 cfgLookup :: String -> Config -> Maybe Server
 cfgLookup k (Config m _) = Map.lookup k m
-
-
-data FailOnLeftException = FailOnLeftException String deriving (Show, Typeable)
-instance Exception FailOnLeftException
-
-
-failOnLeft :: Either String b -> b
-failOnLeft (Right e) = e
-failOnLeft (Left str')  = throw $ FailOnLeftException str'
 
 data FailOnNothingException = FailOnNothingException String deriving (Show, Typeable)
 instance Exception FailOnNothingException

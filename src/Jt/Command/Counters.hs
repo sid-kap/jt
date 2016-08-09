@@ -4,6 +4,7 @@ module Jt.Command.Counters (
 ) where
 
 import Jt
+import Jt.Utils (failOnLeft)
 import Jt.Command.Utils
 import Jt.Server
 import Options.Applicative
