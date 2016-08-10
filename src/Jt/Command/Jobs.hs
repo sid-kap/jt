@@ -9,12 +9,15 @@ import qualified Jt.Job as Job
 import Jt.Server
 import Data.Maybe (fromMaybe, catMaybes)
 import Data.Text (pack)
+import Data.List (sortOn)
 import Options.Applicative
 import qualified Jt.QueryParameters as QP
 import Jt.Command.Utils
 import Data.List (intercalate)
 import Options.Applicative.Types
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
+import Data.Time.Clock (NominalDiffTime, UTCTime, diffUTCTime, getCurrentTime)
+import Data.Time.LocalTime (TimeZone, utcToLocalTime, getCurrentTimeZone)
 
 data ValidState = Running | Successful | Failed | Killed
 
@@ -83,11 +86,28 @@ jobsParser = let
              <*> history <*> rm <*> stateP <*> tabs
 
 
-toLineSummary :: Job.Job -> [String]
-toLineSummary Job.Job{..} =
+toLineSummary :: TimeZone -> UTCTime -> Job.Job -> [String]
+toLineSummary timezone currentTime Job.Job{..} =
   let
-    startedTime' = show . posixSecondsToUTCTime . fromIntegral . (`div` 1000) $ startedTime
-  in [name, user, state, jobId, startedTime']
+    startedTimeUTC = posixSecondsToUTCTime . fromIntegral . (`div` 1000) $ startedTime
+    startedTime' = show . utcToLocalTime timezone $ startedTimeUTC
+    timeSince = currentTime `diffUTCTime` startedTimeUTC
+  in [ name, user, state, jobId
+     , showDiffTime timeSince ++ " ago" ]
+
+showDiffTime :: NominalDiffTime -> String
+showDiffTime timeSince = case (days, hours, minutes, seconds) of
+  (0, 0, 0, s) -> show s ++ " seconds"
+  (0, 0, m, s) -> show m ++ " minutes"
+  (0, h, m, s) -> show h ++ " hours, " ++ show m ++ " minutes"
+  (d, h, m, s) -> show d ++ " days"
+  where
+    totalSeconds = round (toRational timeSince) :: Integer
+    days    = totalSeconds `div` (60 * 60 * 24)
+    hours   = (totalSeconds `div` (60 * 60)) `mod` (24)
+    minutes = (totalSeconds `div` 60) `mod` 60
+    seconds = totalSeconds `mod` 60
+
 
 headLine :: [String]
 headLine = ["Name", "User", "State", "JobId", "StartedTime"]
@@ -122,8 +142,11 @@ printResults conf sargs = do
               then appJobsWithOpts appQueryParameters (appUrl server)
               else return $ Right []
 
+  currentTime <- getCurrentTime
+  timezone <- getCurrentTimeZone
+
   let
-    jobLimited = map toLineSummary . take maxLimit <$> combineEither rmJobs historyJobs
+    jobLimited = map (toLineSummary timezone currentTime) . sortOn Job.startedTime . take maxLimit <$> combineEither rmJobs historyJobs
 
   summarizedJobs <- failOnLeft' jobLimited
 
